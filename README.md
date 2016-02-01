@@ -3,4 +3,4 @@ A project to use a Raspberry Pi to create a digital lock/unlock mechanism for a 
 
 [![Join the chat at https://gitter.im/TheKing42/Pi-Lock](https://badges.gitter.im/TheKing42/Pi-Lock.svg)](https://gitter.im/TheKing42/Pi-Lock?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Build Status](https://travis-ci.org/theking42/Pi-Lock.svg?branch=master)](https://travis-ci.org/theking42/Pi-Lock)
+[![Build Status](https://travis-ci.org/TheKing42/Pi-Lock.svg?branch=master)](https://travis-ci.org/TheKing42/Pi-Lock)
