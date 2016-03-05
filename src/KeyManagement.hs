@@ -14,6 +14,24 @@ randomizeFile :: Int -> FilePath -> IO ()
 randomizeFile bytes name = withBinaryFile "/dev/urandom" ReadMode $ \rand ->
     B.hGet rand bytes >>= B.writeFile name
 
+-- | Monitor a directory for new keys, and randomize any new empty keys
+randomizeNewKeys :: Int -> FilePath -> IO a
+randomizeNewKeys bytes dir = withINotify $ \int -> do
+    addWatch int [Create] dir $ \case
+        Created False newkey -> inDir dir $ do
+            if ".key" `isSuffixOf` newkey
+                then do
+                    putStr "New Key: "
+                    putStrLn newkey
+                    content <- readFile newkey
+                    if null content --Only randomize empty keys, so we don't overwite good ones by accident
+                        then putStrLn "randomized" >> randomizeFile bytes newkey
+                        else return ()
+                else return ()
+        other -> return ()
+
+    let sleep = threadDelay maxBound >> sleep in sleep --So `withINotify` does not close prematurely
+
 -- | Finds a key file in a directory and returns its path
 getKeyFile :: FilePath -> IO (Maybe FilePath)
 getKeyFile name = bracket (openDirStream name) closeDirStream igo
