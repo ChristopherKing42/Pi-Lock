@@ -72,9 +72,10 @@ checkKeys
 
 checkKeys bytes wait keys metadir good bad = withINotify $ \int -> do
     changeWorkingDirectory metadir
-    addWatch int [AllEvents] metadir $ \case
-        Created True dir -> threadDelay wait >> checkDir bytes keys dir good bad
-        other -> print other --Impossible
+    addWatch int [AllEvents] metadir $ (\case
+        Created True dir -> putStr "New USB device: " >> putStrLn dir >> threadDelay wait >> checkDir bytes keys dir good bad
+        other -> print other --
+        )
     let sleep = threadDelay maxBound >> sleep in sleep --So `withINotify` does not close prematurely
 
 -- | Checks a directory for a key
@@ -95,6 +96,7 @@ checkDir bytes keys dir good bad = (try $ getKeyFile dir) >>= \case
             valid <- inDir dir $ key `fileIn` keys
             if valid
             then do
+                putStr "Randomizing " >> putStr key
                 inDir keys $ randomizeFile bytes key --Rerandomize key to prevent copying
                 inDir keys (B.readFile key) >>= inDir dir . B.writeFile key
                 return $ good dir key
